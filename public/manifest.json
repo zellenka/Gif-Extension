@@ -2,11 +2,18 @@
  "manifest_version": 2,
  "name": "Gif Extension",
  "version": "0.0.1",
+ "description": "Fast and simple gif search",
  "browser_action": {
   "default_icon": {
-    "16": "logo192.png",
-    "24": "logo192.png",
-    "32": "logo192.png"
+    "16": "logo16.png",
+    "24": "logo24.png",
+    "32": "logo32.png"
+  },
+  "icons": {
+    "16": "logo16.png",
+    "32": "logo32.png",
+    "48": "logo48.png",
+    "128": "logo128.png"
   },
   "default_title": "Search gif",
   "default_popup": "index.html"

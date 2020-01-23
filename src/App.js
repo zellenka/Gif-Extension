@@ -1,49 +1,93 @@
-import React, { useState, useEffect } from 'react';
-//import CountrySelect from './CountrySelect'
+import React, { Component } from 'react';
 import BigImage from './BigImage'
 import './App.css';
 
+
 const APi_key = process.env.REACT_APP_API_KEY;
 
-function App() {
+class App extends Component {
+  constructor(props) {
+    super(props);
 
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
-  const [BigImageSrc, setSrc] = useState({});
-  const [itemLimit, setLimit] = useState(12);
-  const [offset, setOffsetQuery] = useState(0);
-  const [url, setUrl] = useState(
-    `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=${itemLimit}&rating=R`,
-  );
+    this.state = {
+      isLoading: false,
+      data: [],
+      inputValue: '',
+      url: `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R`,
+      offset: 12,
+      BigImageSrc: {}
+    };
 
-  useEffect(() => {
-    fetchData();
-  }, [search]);
+    window.onscroll = () => {
+      if ((Math.ceil(window.innerHeight) + Math.ceil(document.documentElement.scrollTop) + 20) > document.documentElement.offsetHeight) {
+       
+        if(this.state.inputValue !== ''){
 
-  const fetchData = async () => {
-    const result = await fetch(url);
-    result
-      .json()
-      .then(result => setData(result.data))
-      .then(() => setIsLoading(false));    
-  };
+          let checkUrl = `https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${this.state.inputValue}&limit=12&offset=${this.state.offset}`
+          
+          fetch(checkUrl)
+          .then(response => response.json())
+          .then(result => this.setState({
+            data: [...this.state.data, ...result.data],
+            isLoading: false,
+            offset: this.state.offset + 12
+          }));
+          
+        } else {
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSearch(searchInput)
-    
+          fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R&offset=${this.state.offset}`)
+          .then(response => response.json())
+          .then(result => this.setState({
+            data: [...this.state.data, ...result.data],
+            isLoading: false,
+            offset: this.state.offset + 12
+          }));
+        }
+
+      }
+    };
+
+
   }
 
-  const handleInputChange = (e) => {
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = () => {
+    this.setState({ isLoading: true });
+
+    fetch(this.state.url)
+      .then(response => response.json())
+      .then(result => this.setState({ data: result.data, isLoading: false }));
+  }
+
+  handleInputChange = (e) => {
     e.persist();
-    setSearchInput(e.target.value);
-    setUrl(`https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${searchInput}&limit=${itemLimit}&offset=${offset}`)
-    setTimeout(() => setSearch(searchInput), 500)
+    this.setState(() => ({ inputValue: e.target.value, offset: 12, data: [], }));
+    this.fetchDataWordSearch(e.target.value);
   }
 
-  const handleOnMouseEnter = (e) => {
+  fetchDataWordSearch = (word) => {
+
+    this.setState({ isLoading: true });
+
+    let wordSearchUrl = '';
+
+    if(word.length === 0){
+      wordSearchUrl = `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R`
+    } else {
+      wordSearchUrl = `https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${word}&limit=12&offset=0`
+    }
+
+    
+    fetch(wordSearchUrl)
+      .then(response => response.json())
+      .then(result => this.setState({ data: result.data, isLoading: false }));
+  }
+
+handleOnMouseEnter = (e) => {
+
     let imageOptions = {
       src: e.target.dataset.big_image_link,
       position:{
@@ -52,54 +96,46 @@ function App() {
       }
 
     }
-    setSrc(imageOptions)
+    
+    this.setState({BigImageSrc: imageOptions})
 
   }
 
-  const handleOnMouseLeave = () => {
-    setSrc('');
+handleOnMouseLeave = () => {
+  this.setState({BigImageSrc: {}})
   }
 
-  const  handleScroll = () => {
-    if (Math.ceil(window.innerHeight) + Math.ceil(document.querySelector('html').scrollTop) !== document.querySelector('html').offsetHeight) return;
-    //setIsLoading(true)
-
-    setUrl(`https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${searchInput}&limit=${itemLimit}&offset=20`)
-    setSearch(searchInput)
-    console.log(9)
+handleSubmit = (e) => {
+    e.preventDefault();
+    this.fetchDataWordSearch(this.state.inputValue);
   }
 
-  // useEffect(() => {
-  //   if (!isLoading) return;
-  //   setSearch(searchInput)
-  //   setUrl(`https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${searchInput}&limit=50&offset=${offset}`)
-  //   setSearch(searchInput)
-  // }, [isLoading]);
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  render() {
 
-  return (
-    <div className="App">
-       <BigImage src={BigImageSrc} />
-       
-      <form onSubmit={handleSubmit} className="form">
-        <input type="text" placeholder="Search hear" className="form__input" value={searchInput} onChange={handleInputChange}/>
-        <button className="form__button">Search</button>
-      </form>
-      {isLoading ? (<div><img src="https://thumbs.gfycat.com/GenuineIllinformedEmu-size_restricted.gif" alt=""/></div>) : (
-          <ul className="items-list">
-          {data.map(item =>
-            <li key={item.id} >
-              <img src={item.images.preview_gif.url} alt={item.title} data-big_image_link={item.images.original.url} onMouseOver={handleOnMouseEnter} onMouseOut={handleOnMouseLeave}/>
-              <button onClick={() => {navigator.clipboard.writeText(item.images.downsized.url)}}>Copy URL</button>
-            </li>)}
+    return (
+      <div className="App">
+        <BigImage src={this.state.BigImageSrc} />
+        <form className="form" onSubmit={this.handleSubmit}>
+          <input type="text" placeholder="Search hear" className="form__input" value={this.state.inputValue} onChange={this.handleInputChange} />
+          <button className="form__button">Search</button>
+        </form>
+        {this.state.data.length === 0 ?
+          (<div><img src="https://media2.giphy.com/media/26tPcVAWvlzRQtsLS/giphy.gif?cid=29caca7596d57f8dd17e2ba660c842dc2e72f42d04a4067f&rid=giphy.gif" alt="" /></div>) :
+          (<ul className="items-list">
+            {this.state.data.map((item, index) =>
+              <li key={index} >
+                <img src={item.images.preview_gif.url ? item.images.preview_gif.url : item.images.original.url} alt={item.title} data-big_image_link={item.images.original.url} onMouseOver={this.handleOnMouseEnter} onMouseOut={this.handleOnMouseLeave} />
+                <div>
+                <button onClick={() => { navigator.clipboard.writeText(item.images.downsized.url) }}>Copy URL</button>
+                
+                </div>
+              </li>)}
           </ul>
-      )} 
-    </div>
-  );
+          )}
+      </div>
+    );
+  }
 }
 
 export default App;
