@@ -3,6 +3,7 @@
   background: #CE5937;
 background: linear-gradient(135deg, #CE5937 0%, #1C6EA4 26%, #C59237 100%);
   width:480px;
+  min-width: 480px;
   height:100%;
   padding: 10px;
   /* overflow-y: scroll; */
@@ -132,6 +133,30 @@ box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15p
   z-index: 20;
 }
 
+.items-list button {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #C06C84;
+  -webkit-box-shadow: 0 3px 2px 0 rgba(0,0,0,0.1);
+          box-shadow: 0 3px 2px 0 rgba(0,0,0,0.1);
+  border-radius: 5px;
+  height: 30px;
+  padding: 0 30px;
+  color: #fff;
+  font-family: Lato, Arial, sans-serif;
+  text-transform: uppercase;
+  text-decoration: none;
+  -webkit-transition: background .3s, -webkit-transform .3s, -webkit-box-shadow .3s;
+  transition: background .3s, -webkit-transform .3s, -webkit-box-shadow .3s;
+  transition: background .3s, transform .3s, box-shadow .3s;
+  transition: background .3s, transform .3s, box-shadow .3s, -webkit-transform .3s, -webkit-box-shadow .3s;
+   will-change: transform;
+}
+
 .preview {
   top: -250px;
   left: -200px;
@@ -151,4 +176,24 @@ box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15p
   height: 100%;
   -o-object-fit: contain;
      object-fit: contain;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar:hover {
+  width: 10px;
 }
