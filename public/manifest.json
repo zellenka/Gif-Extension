@@ -4,9 +4,9 @@
  "version": "0.0.1",
  "browser_action": {
   "default_icon": {
-    "16": "logo192.png",
-    "24": "logo192.png",
-    "32": "logo192.png"
+    "16": "logo512.png",
+    "24": "logo512.png",
+    "32": "logo512.png"
   },
   "default_title": "Search gif",
   "default_popup": "index.html"
