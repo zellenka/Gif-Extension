@@ -214,25 +214,6 @@ box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15p
   border: none;
 }
 
-/* .terms__button:hover{
-   background-image: -webkit-gradient(linear, left top, right top, from(#00C0FF), color-stop(49%, #FFCF00), color-stop(80%, #FC4F4F), to(#00C0FF));
-   background-image: linear-gradient(90deg, #00C0FF 0%, #FFCF00 49%, #FC4F4F 80%, #00C0FF 100%);
-   -webkit-animation:slidebg 5s linear infinite;
-           animation:slidebg 5s linear infinite;
-} */
-
 .terms__button:active, .terms__button:active, .terms__button:hover {
   box-shadow: 0px 0px 49px -3px rgba(212,204,212,1);
-}
-
-@-webkit-keyframes slidebg {
-  to {
-    background-position:20vw;
-  }
-}
-
-@keyframes slidebg {
-  to {
-    background-position:20vw;
-  }
 }
