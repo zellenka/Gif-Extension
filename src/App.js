@@ -13,78 +13,90 @@ class App extends Component {
       isLoading: false,
       data: [],
       inputValue: '',
-      url: `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R`,
+      url: `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R&offset=0`,
       offset: 12,
-      BigImageSrc: {}
+      BigImageSrc: {},
+      timeout: null,
     };
 
     window.onscroll = () => {
       if ((Math.ceil(window.innerHeight) + Math.ceil(document.documentElement.scrollTop) + 20) > document.documentElement.offsetHeight) {
-       
-        if(this.state.inputValue !== ''){
+
+        if (this.state.inputValue !== '') {
 
           let checkUrl = `https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${this.state.inputValue}&limit=12&offset=${this.state.offset}`
-          
+
           fetch(checkUrl)
-          .then(response => response.json())
-          .then(result => this.setState({
-            data: [...this.state.data, ...result.data],
-            isLoading: false,
-            offset: this.state.offset + 12
-          }));
-          
+            .then(response => response.json())
+            .then(result => this.setState({
+              data: [...this.state.data, ...result.data],
+              isLoading: false,
+              offset: this.state.offset + 12
+            }))
+            .then(
+              this.setState(function(prevState, props){
+                return {offset: prevState.offset + 12}
+             })
+            );
+
         } else {
 
           fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R&offset=${this.state.offset}`)
-          .then(response => response.json())
-          .then(result => this.setState({
-            data: [...this.state.data, ...result.data],
-            isLoading: false,
-            offset: this.state.offset + 12
-          }));
+            .then(response => response.json())
+            .then(result => this.setState({
+              data: [...this.state.data, ...result.data],
+              isLoading: false,
+            }))
+            .then(
+              this.setState(function(prevState, props){
+                return {offset: prevState.offset + 12}
+             })
+            );
+
+
         }
 
       }
     };
 
-
   }
 
-  componentDidMount() {
-    this.fetchData();
+componentDidMount() {
+  this.fetchData();
+}
+
+fetchData = () => {
+  this.setState({ isLoading: true });
+
+  fetch(this.state.url)
+    .then(response => response.json())
+    .then(result => this.setState({ data: result.data, isLoading: false }));
+}
+
+handleInputChange = (e) => {
+  e.persist();
+  this.setState(() => ({ inputValue: e.target.value, offset: 12, data: [], }));
+  clearTimeout(this.timeout);
+  this.timeout = setTimeout( () => this.fetchDataWordSearch(e.target.value), 400);
+}
+
+fetchDataWordSearch = (word) => {
+
+  this.setState({ isLoading: true });
+
+  let wordSearchUrl = '';
+
+  if(word.length === 0){
+    wordSearchUrl = `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R`
+  } else {
+    wordSearchUrl = `https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${word}&limit=12&offset=0`
   }
 
-  fetchData = () => {
-    this.setState({ isLoading: true });
-
-    fetch(this.state.url)
-      .then(response => response.json())
-      .then(result => this.setState({ data: result.data, isLoading: false }));
-  }
-
-  handleInputChange = (e) => {
-    e.persist();
-    this.setState(() => ({ inputValue: e.target.value, offset: 12, data: [], }));
-    this.fetchDataWordSearch(e.target.value);
-  }
-
-  fetchDataWordSearch = (word) => {
-
-    this.setState({ isLoading: true });
-
-    let wordSearchUrl = '';
-
-    if(word.length === 0){
-      wordSearchUrl = `https://api.giphy.com/v1/gifs/trending?api_key=${APi_key}&limit=12&rating=R`
-    } else {
-      wordSearchUrl = `https://api.giphy.com/v1/gifs/search?api_key=${APi_key}&q=${word}&limit=12&offset=0`
-    }
-
-    
-    fetch(wordSearchUrl)
-      .then(response => response.json())
-      .then(result => this.setState({ data: result.data, isLoading: false }));
-  }
+  
+  fetch(wordSearchUrl)
+    .then(response => response.json())
+    .then(result => this.setState({ data: result.data, isLoading: false }));
+}
 
 handleOnMouseEnter = (e) => {
 
@@ -127,7 +139,7 @@ handleSubmit = (e) => {
               <li key={index} >
                 <img src={item.images.preview_gif.url ? item.images.preview_gif.url : item.images.original.url} alt={item.title} data-big_image_link={item.images.original.url} onMouseOver={this.handleOnMouseEnter} onMouseOut={this.handleOnMouseLeave} />
                 <div>
-                <button onClick={() => { navigator.clipboard.writeText(item.images.downsized.url) }}>Copy URL</button>
+                <button onClick={() => { navigator.clipboard.writeText(item.images.downsized.url) }}>Copy Link</button>
                 
                 </div>
               </li>)}
