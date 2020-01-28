@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import BigImage from './BigImage'
+import PopularTerms from './PopularTerms'
 import './App.css';
 
 
@@ -80,6 +81,12 @@ handleInputChange = (e) => {
   this.timeout = setTimeout( () => this.fetchDataWordSearch(e.target.value), 400);
 }
 
+handlePopularTermSearch = (e) =>{
+  let poplarTerm = e.target.value;
+  this.setState(() => ({ inputValue: poplarTerm, offset: 12, data: [], }));
+  this.fetchDataWordSearch(poplarTerm)
+}
+
 fetchDataWordSearch = (word) => {
 
   this.setState({ isLoading: true });
@@ -132,6 +139,7 @@ handleSubmit = (e) => {
           <input type="text" placeholder="Search hear" className="form__input" value={this.state.inputValue} onChange={this.handleInputChange} />
           <button className="form__button">Search</button>
         </form>
+        <PopularTerms clickHandler={this.handlePopularTermSearch}/>
         {this.state.data.length === 0 ?
           (<div><img src="https://media2.giphy.com/media/26tPcVAWvlzRQtsLS/giphy.gif?cid=29caca7596d57f8dd17e2ba660c842dc2e72f42d04a4067f&rid=giphy.gif" alt="" /></div>) :
           (<ul className="items-list">
